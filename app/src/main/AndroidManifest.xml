@@ -12,6 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Hongman"
         android:usesCleartextTraffic="true">
+        <activity android:name=".StoreMain"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
