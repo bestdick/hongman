@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private void login(){
         String url = "http://122.46.245.107:12188/hongs_project/webroot_common/eindex.html";
         Map<String, String> params = new HashMap<>();
-        params.put("mode", )
+
         _ServerCommunicator serverCommunicator = new _ServerCommunicator( this, url );
         serverCommunicator._Communicator(new _ServerCommunicator.VolleyCallback() {
             @Override
