@@ -3,19 +3,24 @@ package com.example.hongman.store_fragment;
 import android.content.Context;
 import android.os.Bundle;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.hongman.R;
+import com.example.hongman.StoreMain;
 import com.example.hongman.server._ServerCommunicator;
 import com.example.hongman.until_func.Debug_msg;
 
@@ -38,6 +43,12 @@ import static com.example.hongman.until_func.static_variable.token;
  */
 public class store_scratchlist_fragment extends Fragment {
     Debug_msg debug_msg = new Debug_msg();
+
+
+    private FrameLayout frameLayout ;
+    private FragmentManager fragmentManager;
+    private FragmentTransaction transaction;
+
     private String shift_action = "in"; // in or out
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -85,6 +96,10 @@ public class store_scratchlist_fragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_store_scratchlist_fragment, container, false);
 
+        fragmentManager = ( (StoreMain) getContext()  ).getSupportFragmentManager();
+        transaction = fragmentManager.beginTransaction();
+        frameLayout = (FrameLayout) rootView.findViewById(R.id.each_input_fragment_container);
+
         // --- SET shift in and out UI elements
         shift_cont_mgr( rootView );
         return rootView;
@@ -93,26 +108,33 @@ public class store_scratchlist_fragment extends Fragment {
         Button shift_in = (Button) rootView.findViewById(R.id.shift_in_btn);
         Button shift_out = (Button) rootView.findViewById(R.id.shift_out_btn);
         LinearLayout shift_in_out_container = (LinearLayout) rootView.findViewById(R.id.shift_in_out_container);
+        LinearLayout scratch_list_container = (LinearLayout) rootView.findViewById(R.id.scratch_list_container);
+        ConstraintLayout each_input_container = (ConstraintLayout) rootView.findViewById(R.id.each_input_container);
+
         shift_in_out_container.setVisibility(View.VISIBLE);
+        scratch_list_container.setVisibility(View.GONE);
+        each_input_container.setVisibility(View.GONE);
 
-        // ---SET LISTVIEW
+        // ---SET List view items .....
         ListView scratch_listview =(ListView) rootView.findViewById(R.id.scratch_listview);
-        scratch_listview.setVisibility(View.INVISIBLE);
-
-        //List<scratchlist_bean> list =new ArrayList<>();
-        List<String> list =new ArrayList<>();
-        //ArrayAdapter<scratchlist_bean> adapter = new ArrayAdapter<scratchlist_bean>( getContext(), android.R.layout.simple_list_item_1 );
-        ArrayAdapter<String> adapter = new ArrayAdapter<>( getContext(), android.R.layout.simple_list_item_1 );
+        List<scratchlist_bean> list =new ArrayList<>();
+        ScratchAdapter adapter = new ScratchAdapter( getContext(), list );
         scratch_listview.setAdapter( adapter );
+        // --- GET list and Draw list view
         get_scratch_list( adapter,  list );
+        // --- SET list on click listener
+        listview_action_mgr( each_input_container, scratch_listview );
+
+
 
 
         shift_in.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 shift_action = "IN";
-                shift_in_out_container.setVisibility(View.INVISIBLE);
-                scratch_listview.setVisibility(View.VISIBLE);
+                shift_in_out_container.setVisibility(View.GONE);
+                scratch_list_container.setVisibility(View.VISIBLE);
+                each_input_container.setVisibility(View.GONE);
             }
         });
 
@@ -120,15 +142,31 @@ public class store_scratchlist_fragment extends Fragment {
             @Override
             public void onClick(View view) {
                 shift_action = "OUT";
-                shift_in_out_container.setVisibility(View.INVISIBLE);
-                scratch_listview.setVisibility(View.VISIBLE);
+                shift_in_out_container.setVisibility(View.GONE);
+                scratch_list_container.setVisibility(View.VISIBLE);
+                each_input_container.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private void listview_action_mgr( ConstraintLayout each_input_container,  ListView scratch_listview ){
+        scratch_listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                debug_msg.debug_msg( 1 , "LISTVIEW POS CHK", "psoition : "+String.valueOf( position ) );
+
+                each_input_container.setVisibility(View.VISIBLE);
+                Fragment store_scratchlist_sub_fragment =
+                        com.example.hongman.store_fragment.store_scratchlist_sub_fragment.newInstance( null, null );
+                transaction = fragmentManager.beginTransaction();
+                transaction.replace(R.id.each_input_fragment_container, store_scratchlist_sub_fragment).commitAllowingStateLoss();
             }
         });
     }
 
 
 
-    private void get_scratch_list( ArrayAdapter<String> adapter, List<String> list ){
+    private void get_scratch_list( ScratchAdapter adapter, List<scratchlist_bean> list ){
         String url = baseurl + "eindex.html" ;
         Map<String, String> params = new HashMap<>();
         params.put( "key", "jhmn");
@@ -142,21 +180,24 @@ public class store_scratchlist_fragment extends Fragment {
             @Override
             public void onSuccess(String result, String connection) {
                 if( connection.equals("connection_success")) {
-                    debug_msg.debug_msg(1, "SCRATCH LIST", result);
+                    debug_msg.debug_msg(1, "SCRATCH INFO", result);
 
                     try {
                         JSONObject jsonObject =  new JSONObject( result );
                         int res = jsonObject.getInt( "res" );
                         if ( res == 0 ){
+                            // ---- container info
+                            JSONObject container = jsonObject.getJSONObject("msg").getJSONObject("container");
+                            JSONArray scratch_list = jsonObject.getJSONObject("msg").getJSONArray("list");
                             // ---- make list ------
-                            JSONArray scratch_list = jsonObject.getJSONArray("msg");
+
                             for( int i = 0 ; i < scratch_list.length(); i++ ){
                                 scratchlist_bean item = new scratchlist_bean(
                                     scratch_list.getJSONObject(i).getInt( "scratch_idx"),scratch_list.getJSONObject(i).getInt( "market_idx"),
-                                        scratch_list.getJSONObject(i).getString( "scratch_name"), scratch_list.getJSONObject(i).getInt( "price")
-
+                                        scratch_list.getJSONObject(i).getInt( "scratch_seq"), scratch_list.getJSONObject(i).getString( "scratch_name"),
+                                        scratch_list.getJSONObject(i).getInt( "price"), scratch_list.getJSONObject(i).getInt( "roll")
                                 ) ;
-                                list.add( scratch_list.getJSONObject(i).getString( "scratch_name") );
+                                list.add( item );
 
                             }
                             adapter.notifyDataSetChanged();
@@ -178,10 +219,10 @@ public class store_scratchlist_fragment extends Fragment {
 
 
 }
-class scratch_adapter extends BaseAdapter{
+class ScratchAdapter extends BaseAdapter{
     Context context;
     List<scratchlist_bean> list;
-    public scratch_adapter(Context context , List<scratchlist_bean> list) {
+    public ScratchAdapter(Context context , List<scratchlist_bean> list) {
         this.context = context;
         this.list = list ;
     }
@@ -192,7 +233,7 @@ class scratch_adapter extends BaseAdapter{
 
     @Override
     public Object getItem(int i) {
-        return i;
+        return list.get(i);
     }
 
     @Override
@@ -202,28 +243,40 @@ class scratch_adapter extends BaseAdapter{
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        return null;
+        View v = View.inflate(context, R.layout.item_in_listview_scratch, null);
+        TextView scratch_seq_text_view = (TextView) v.findViewById(R.id.scratch_seq_text_view);
+        TextView scratch_name_text_view = (TextView) v.findViewById(R.id.scratch_name_text_view);
+        TextView price_text_view = (TextView) v.findViewById(R.id.price_text_view);
+        TextView per_roll_text_view = (TextView) v.findViewById(R.id.per_roll_text_view);
+
+        int scratch_seq = list.get(i).getScratch_seq();
+        String scratch_name = list.get(i).getScratch_name();
+        int price = list.get(i).getPrice();
+        int roll = list.get(i).getPer_roll();
+
+        scratch_seq_text_view.setText( "#"+String.valueOf( scratch_seq ) );
+        scratch_name_text_view.setText( scratch_name );
+        price_text_view.setText( "$" + String.valueOf(price) );
+        per_roll_text_view.setText( String.valueOf( roll )  );
+
+        return v ;
     }
 }
+
 class scratchlist_bean{
     int scratch_idx ;
     int market_idx ;
+    int scratch_seq ;
     String scratch_name;
     int price;
+    int per_roll;
 
-    public scratchlist_bean(int scratch_idx, int market_idx, String scratch_name, int price) {
-        this.scratch_idx = scratch_idx;
-        this.market_idx = market_idx;
-        this.scratch_name = scratch_name;
-        this.price = price;
-    }
-
-    public int getScratch_list() {
+    public int getScratch_idx() {
         return scratch_idx;
     }
 
-    public void setScratch_list(int scratch_list) {
-        this.scratch_idx = scratch_list;
+    public void setScratch_idx(int scratch_idx) {
+        this.scratch_idx = scratch_idx;
     }
 
     public int getMarket_idx() {
@@ -232,6 +285,14 @@ class scratchlist_bean{
 
     public void setMarket_idx(int market_idx) {
         this.market_idx = market_idx;
+    }
+
+    public int getScratch_seq() {
+        return scratch_seq;
+    }
+
+    public void setScratch_seq(int scratch_seq) {
+        this.scratch_seq = scratch_seq;
     }
 
     public String getScratch_name() {
@@ -248,5 +309,22 @@ class scratchlist_bean{
 
     public void setPrice(int price) {
         this.price = price;
+    }
+
+    public int getPer_roll() {
+        return per_roll;
+    }
+
+    public void setPer_roll(int per_roll) {
+        this.per_roll = per_roll;
+    }
+
+    public scratchlist_bean(int scratch_idx, int market_idx, int scratch_seq, String scratch_name, int price, int per_roll) {
+        this.scratch_idx = scratch_idx;
+        this.market_idx = market_idx;
+        this.scratch_seq = scratch_seq;
+        this.scratch_name = scratch_name;
+        this.price = price;
+        this.per_roll = per_roll;
     }
 }
