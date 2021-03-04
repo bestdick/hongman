@@ -118,6 +118,7 @@ public class store_scratchlist_fragment extends Fragment {
         shift_cont_mgr( rootView );
         return rootView;
     }
+
     private void shift_cont_mgr(View rootView){
         Button shift_in = (Button) rootView.findViewById(R.id.shift_in_btn);
         Button shift_out = (Button) rootView.findViewById(R.id.shift_out_btn);

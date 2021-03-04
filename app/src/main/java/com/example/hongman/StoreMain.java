@@ -71,6 +71,7 @@ public class StoreMain extends AppCompatActivity {
                         transaction.replace(R.id.store_main_container, store_mainlist_fragment).commitAllowingStateLoss();
                         break;
                     case 1:
+                     //   get_scratch_flow_info();
                         Fragment store_scratchlist_fragment =
                                 com.example.hongman.store_fragment.store_scratchlist_fragment.newInstance( market_idx, null );
                         transaction = fragmentManager.beginTransaction();
@@ -98,6 +99,23 @@ public class StoreMain extends AppCompatActivity {
 
     }
 
+    private void get_scratch_flow_info(){
+        String url = baseurl + "eindex.html" ;
+        Map<String, String> params = new HashMap<>();
+        params.put( "key", "jhmn");
+        params.put( "mode", "protocol_contents_ajax");
+        params.put( "code", "20201");
+        params.put( "market_idx", String.valueOf( market_idx ) );
+        params.put( "token", token);
+
+        _ServerCommunicator serverCommunicator = new _ServerCommunicator( this, url );
+        serverCommunicator._Communicator(new _ServerCommunicator.VolleyCallback() {
+            @Override
+            public void onSuccess(String result, String connection) {
+                debug_msg.debug_msg( 1 , "STORE LOGIN", result );
+            }
+        } , params);
+    }
     private void set_store_login_log(){
         String url = baseurl + "eindex.html" ;
         Map<String, String> params = new HashMap<>();
