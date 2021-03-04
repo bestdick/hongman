@@ -7,8 +7,11 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.example.hongman.R;
+import com.example.hongman.StoreMain;
+import com.example.hongman.until_func.Debug_msg;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -16,14 +19,15 @@ import com.example.hongman.R;
  * create an instance of this fragment.
  */
 public class store_scratchlist_sub_fragment extends Fragment {
+    Debug_msg debug_msg = new Debug_msg();
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM1 = "market_idx";
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
+    private int market_idx;
     private String mParam2;
 
     public store_scratchlist_sub_fragment() {
@@ -39,10 +43,10 @@ public class store_scratchlist_sub_fragment extends Fragment {
      * @return A new instance of fragment store_scratchlist_sub_fragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static store_scratchlist_sub_fragment newInstance(String param1, String param2) {
+    public static store_scratchlist_sub_fragment newInstance(int param1, String param2) {
         store_scratchlist_sub_fragment fragment = new store_scratchlist_sub_fragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
+        args.putInt(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
@@ -52,7 +56,7 @@ public class store_scratchlist_sub_fragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
+            market_idx = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
@@ -61,6 +65,23 @@ public class store_scratchlist_sub_fragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_store_scratchlist_sub_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_store_scratchlist_sub_fragment, container, false);
+
+        debug_msg.debug_msg( 1 , "SUB FRAG M_IDX" , String.valueOf( market_idx ) ) ;
+        ui_cont_mgr( rootView );
+        return rootView;
+    }
+
+    private void ui_cont_mgr( View rootView ){
+        Button close_btn = ( Button ) rootView.findViewById(R.id.close_btn);
+        Button submit_btn = ( Button ) rootView.findViewById(R.id.submit_btn);
+
+        close_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getActivity().getSupportFragmentManager().beginTransaction().detach(store_scratchlist_sub_fragment.this).commitAllowingStateLoss();
+                        //.remove(store_scratchlist_sub_fragment.this).commit();
+            }
+        });
     }
 }

@@ -55,37 +55,43 @@
 
     </LinearLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
         android:id="@+id/each_input_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#E6f6f6f6"
-        android:visibility="gone"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-        <FrameLayout
-            android:id="@+id/each_input_fragment_container"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="64dp"
-            android:layout_marginLeft="64dp"
-            android:layout_marginTop="160dp"
-            android:layout_marginEnd="64dp"
-            android:layout_marginRight="64dp"
-            android:layout_marginBottom="160dp"
-            android:background="@color/white"
+            <FrameLayout
+                android:id="@+id/each_input_fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="64dp"
+                android:layout_marginLeft="64dp"
+                android:layout_marginEnd="64dp"
+                android:layout_marginRight="64dp"
+                android:background="@color/white"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
 
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-        </FrameLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            </FrameLayout>
+        </LinearLayout>
+
+
+    </ScrollView>
     <!--
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/each_input_container"

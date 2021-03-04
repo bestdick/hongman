@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.hongman.R;
@@ -109,7 +110,7 @@ public class store_scratchlist_fragment extends Fragment {
         Button shift_out = (Button) rootView.findViewById(R.id.shift_out_btn);
         LinearLayout shift_in_out_container = (LinearLayout) rootView.findViewById(R.id.shift_in_out_container);
         LinearLayout scratch_list_container = (LinearLayout) rootView.findViewById(R.id.scratch_list_container);
-        ConstraintLayout each_input_container = (ConstraintLayout) rootView.findViewById(R.id.each_input_container);
+        ScrollView each_input_container = (ScrollView) rootView.findViewById(R.id.each_input_container);
 
         shift_in_out_container.setVisibility(View.VISIBLE);
         scratch_list_container.setVisibility(View.GONE);
@@ -149,22 +150,24 @@ public class store_scratchlist_fragment extends Fragment {
         });
     }
 
-    private void listview_action_mgr( ConstraintLayout each_input_container,  ListView scratch_listview ){
+    private void listview_action_mgr( ScrollView each_input_container,  ListView scratch_listview ){
         scratch_listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 debug_msg.debug_msg( 1 , "LISTVIEW POS CHK", "psoition : "+String.valueOf( position ) );
 
                 each_input_container.setVisibility(View.VISIBLE);
-                Fragment store_scratchlist_sub_fragment =
-                        com.example.hongman.store_fragment.store_scratchlist_sub_fragment.newInstance( null, null );
-                transaction = fragmentManager.beginTransaction();
-                transaction.replace(R.id.each_input_fragment_container, store_scratchlist_sub_fragment).commitAllowingStateLoss();
+//                Fragment store_scratchlist_sub_fragment = new store_scratchlist_sub_fragment();
+//                        // com.example.hongman.store_fragment.store_scratchlist_sub_fragment.newInstance( market_idx , null );
+//                transaction = fragmentManager.beginTransaction();
+//                transaction.replace(R.id.each_input_fragment_container, store_scratchlist_sub_fragment).commitAllowingStateLoss();
             }
         });
     }
 
-
+//    public void remove_fragment( Fragment fragment ){
+//        transaction.remove(fragment).commit();
+//    }
 
     private void get_scratch_list( ScratchAdapter adapter, List<scratchlist_bean> list ){
         String url = baseurl + "eindex.html" ;
