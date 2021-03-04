@@ -17,10 +17,14 @@ import com.example.hongman.store_fragment.store_scratchlist_fragment;
 import com.example.hongman.until_func.Debug_msg;
 import com.google.android.material.tabs.TabLayout;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.example.hongman.until_func.static_variable.baseurl;
+import static com.example.hongman.until_func.static_variable.scratch_chk;
 import static com.example.hongman.until_func.static_variable.token;
 
 public class StoreMain extends AppCompatActivity {
@@ -71,7 +75,7 @@ public class StoreMain extends AppCompatActivity {
                         transaction.replace(R.id.store_main_container, store_mainlist_fragment).commitAllowingStateLoss();
                         break;
                     case 1:
-                     //   get_scratch_flow_info();
+                        get_scratch_flow_info();
                         Fragment store_scratchlist_fragment =
                                 com.example.hongman.store_fragment.store_scratchlist_fragment.newInstance( market_idx, null );
                         transaction = fragmentManager.beginTransaction();
@@ -113,6 +117,20 @@ public class StoreMain extends AppCompatActivity {
             @Override
             public void onSuccess(String result, String connection) {
                 debug_msg.debug_msg( 1 , "STORE LOGIN", result );
+                if( connection.equals("connection_success")){
+
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        if( jsonObject.getInt("res") == 0 ){
+                            scratch_chk = jsonObject.getString("msg");
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }else{
+
+                }
             }
         } , params);
     }

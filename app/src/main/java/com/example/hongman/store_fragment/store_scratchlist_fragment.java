@@ -1,6 +1,9 @@
 package com.example.hongman.store_fragment;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -37,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.example.hongman.until_func.static_variable.baseurl;
+import static com.example.hongman.until_func.static_variable.scratch_chk;
 import static com.example.hongman.until_func.static_variable.token;
 
 /**
@@ -103,13 +107,13 @@ public class store_scratchlist_fragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-
+    Context mainContext ;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_store_scratchlist_fragment, container, false);
-
+        mainContext = container.getContext();
         fragmentManager = ( (StoreMain) getContext()  ).getSupportFragmentManager();
         transaction = fragmentManager.beginTransaction();
         frameLayout = (FrameLayout) rootView.findViewById(R.id.each_input_fragment_container);
@@ -157,12 +161,27 @@ public class store_scratchlist_fragment extends Fragment {
         shift_out.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                shift_action = "OUT";
-                shift_in_out_container.setVisibility(View.GONE);
-                scratch_list_container.setVisibility(View.VISIBLE);
-                each_input_container.setVisibility(View.GONE);
-                // --- GET list and Draw list view
-                get_scratch_list( adapter );
+                debug_msg.debug_msg(1, "SCRATCH_CHK", scratch_chk );
+                if( scratch_chk.equals( "D" ) ){
+                    shift_action = "OUT";
+                    shift_in_out_container.setVisibility(View.GONE);
+                    scratch_list_container.setVisibility(View.VISIBLE);
+                    each_input_container.setVisibility(View.GONE);
+                    // --- GET list and Draw list view
+                    get_scratch_list( adapter );
+                }else{
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(mainContext);
+                    dialog.setTitle("you need to finish shift in scratch")
+                            .setPositiveButton("okay", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            });
+                    dialog.show();
+
+                }
+
             }
         });
     }
