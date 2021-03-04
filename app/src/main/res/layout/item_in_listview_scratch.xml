@@ -22,6 +22,7 @@
             android:text="scratch name"
             android:padding="8dp"/>
         <TextView
+            android:id="@+id/current_seq_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="click to write current sequence"
