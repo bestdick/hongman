@@ -105,7 +105,7 @@ public class store_scratchlist_sub_fragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ( ( store_scratchlist_fragment ) getParentFragment() ).submit_sub_fragment( store_scratchlist_sub_fragment.this ,
-                        scratch_info.getInt("list_position") , scratch_info.getInt("seq"), Integer.parseInt( num_scratch_edit_text.getText().toString() )  );
+                        scratch_info.getInt("list_position") , scratch_info.getInt("scratch_idx"), Integer.parseInt( num_scratch_edit_text.getText().toString() )  );
             }
         });
     }
